@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database TOGA Kelurahan Sambiroto</title>
+    <style>
+        /* --- CSS Reset & Basic Styling --- */
+        :root {
+            --primary-green: #2a9d8f;
+            --secondary-green: #e9c46a;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        /* --- Header & Navigation --- */
+        header {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+        }
+
+        /* --- Main Content --- */
+        main {
+            padding: 2rem 5%;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-green);
+        }
+
+        /* --- Search Bar --- */
+        .search-container {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        #search-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 0.8rem;
+            font-size: 1rem;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+        #search-input:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 5px rgba(42, 157, 143, 0.5);
+        }
+
+        /* --- TOGA Grid & Cards --- */
+        .toga-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .toga-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .toga-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .toga-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .toga-card-content {
+            padding: 1rem;
+        }
+
+        .toga-card-content h3 {
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* --- Modal/Popup Detail --- */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex; /* Show when active */
+        }
+        
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 700px;
+            position: relative;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: scale(0.9);}
+            to {opacity: 1; transform: scale(1);}
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-body h2 {
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+        
+        .modal-body h4 {
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: #344e41;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Database TOGA Sambiroto</h1>
+        </header>
+
+    <main>
+        <section class="hero">
+            <h2>Ensiklopedia Tanaman Obat Keluarga</h2>
+            <p>Temukan manfaat dan cara pengolahan TOGA di sekitar Anda.</p>
+        </section>
+
+        <section class="search-container">
+            <input type="text" id="search-input" placeholder="Cari nama tanaman, contoh: Jahe...">
+        </section>
+
+        <section id="toga-grid" class="toga-grid">
+            </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 KKN-T 118 UNDIP & Kelurahan Sambiroto</p>
+    </footer>
+
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="modal-body" class="modal-body">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- DATABASE TANAMAN (Bisa ditambah atau diubah) ---
+            const togaData = [
+                {
+                    id: 1,
+                    nama: "Jahe",
+                    namaLatin: "Zingiber officinale",
+                    gambar: "https://via.placeholder.com/300x200.png?text=Jahe", // Ganti dengan URL gambar asli
+                    deskripsiSingkat: "Rimpang populer sebagai rempah-rempah dan bahan obat.",
+                    manfaat: "Meredakan mual, mengurangi peradangan, menghangatkan tubuh, dan membantu mengatasi masuk angin.",
+                    caraPengolahan: "Dapat direbus untuk dijadikan wedang, diparut untuk diambil sarinya, atau dikeringkan menjadi bubuk."
+                },
+                {
+                    id: 2,
+                    nama: "Kunyit",
+                    namaLatin: "Curcuma longa",
+                    gambar: "https://via.placeholder.com/300x200.png?text=Kunyit", // Ganti dengan URL gambar asli
+                    deskripsiSingkat: "Rimpang berwarna kuning pekat yang kaya akan kurkumin.",
+                    manfaat: "Anti-inflamasi, antioksidan, baik untuk kesehatan lambung, dan dapat meningkatkan daya tahan tubuh.",
+                    caraPengolahan: "Diparut dan diperas untuk membuat jamu kunyit asam, atau dijadikan bumbu masakan."
+                },
+                {
+                    id: 3,
+                    nama: "Lidah Buaya",
+                    namaLatin: "Aloe vera",
+                    gambar: "https://via.placeholder.com/300x200.png?text=Lidah+Buaya", // Ganti dengan URL gambar asli
+                    deskripsiSingkat: "Tanaman sukulen dengan daun tebal berisi gel bening.",
+                    manfaat: "Menyembuhkan luka bakar ringan, melembapkan kulit, baik untuk kesehatan rambut, dan dapat dibuat minuman.",
+                    caraPengolahan: "Ambil gel di dalam daun. Bisa langsung dioleskan ke kulit atau diolah menjadi jus."
+                },
+                {
+                    id: 4,
+                    nama: "Kencur",
+                    namaLatin: "Kaempferia galanga",
+                    gambar: "https://via.placeholder.com/300x200.png?text=Kencur", // Ganti dengan URL gambar asli
+                    deskripsiSingkat: "Rimpang dengan aroma khas yang sering digunakan untuk jamu.",
+                    manfaat: "Meredakan batuk, menambah nafsu makan, dan mengatasi pegal linu.",
+                    caraPengolahan: "Dihaluskan bersama beras untuk jamu beras kencur atau sebagai bumbu pecel."
+                }
+            ];
+
+            // --- ELEMEN DOM ---
+            const grid = document.getElementById('toga-grid');
+            const searchInput = document.getElementById('search-input');
+            const modal = document.getElementById('detail-modal');
+            const modalBody = document.getElementById('modal-body');
+            const closeModal = document.querySelector('.modal-close');
+
+            // --- FUNGSI UNTUK MENAMPILKAN TANAMAN ---
+            function displayToga(data) {
+                grid.innerHTML = ''; // Kosongkan grid sebelum menampilkan data baru
+                data.forEach(tanaman => {
+                    const card = document.createElement('div');
+                    card.className = 'toga-card';
+                    card.dataset.id = tanaman.id; // Simpan ID untuk event klik
+                    
+                    card.innerHTML = `
+                        <img src="${tanaman.gambar}" alt="${tanaman.nama}">
+                        <div class="toga-card-content">
+                            <h3>${tanaman.nama}</h3>
+                            <p>${tanaman.deskripsiSingkat}</p>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            // --- FUNGSI UNTUK MEMBUKA MODAL ---
+            function openModal(id) {
+                const tanaman = togaData.find(t => t.id == id);
+                if (!tanaman) return;
+
+                modalBody.innerHTML = `
+                    <h2>${tanaman.nama}</h2>
+                    <p><i>${tanaman.namaLatin}</i></p>
+                    <br>
+                    <img src="${tanaman.gambar}" alt="${tanaman.nama}" style="width:100%; max-height: 250px; object-fit: cover; border-radius: 5px;">
+                    <h4>Manfaat & Khasiat</h4>
+                    <p>${tanaman.manfaat}</p>
+                    <h4>Cara Pengolahan</h4>
+                    <p>${tanaman.caraPengolahan}</p>
+                `;
+                modal.classList.add('active');
+            }
+            
+            // --- EVENT LISTENERS ---
+
+            // Pencarian
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredData = togaData.filter(tanaman => 
+                    tanaman.nama.toLowerCase().includes(searchTerm)
+                );
+                displayToga(filteredData);
+            });
+
+            // Klik pada kartu tanaman untuk membuka modal
+            grid.addEventListener('click', (e) => {
+                const card = e.target.closest('.toga-card');
+                if (card) {
+                    openModal(card.dataset.id);
+                }
+            });
+
+            // Menutup modal
+            closeModal.addEventListener('click', () => modal.classList.remove('active'));
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+
+            // --- TAMPILKAN SEMUA DATA SAAT AWAL MEMBUKA HALAMAN ---
+            displayToga(togaData);
+
+        });
+    </script>
+</body>
+</html>
