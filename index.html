@@ -220,7 +220,7 @@
                     id: 1,
                     nama: "Jahe",
                     namaLatin: "Zingiber officinale",
-                    gambar: "https://via.placeholder.com/300x200.png?text=Jahe", // Ganti dengan URL gambar asli
+                    gambar: "web/images/jahe.jpg", // Ganti dengan URL gambar asli
                     deskripsiSingkat: "Rimpang populer sebagai rempah-rempah dan bahan obat.",
                     manfaat: "Meredakan mual, mengurangi peradangan, menghangatkan tubuh, dan membantu mengatasi masuk angin.",
                     caraPengolahan: "Dapat direbus untuk dijadikan wedang, diparut untuk diambil sarinya, atau dikeringkan menjadi bubuk."
@@ -229,7 +229,7 @@
                     id: 2,
                     nama: "Kunyit",
                     namaLatin: "Curcuma longa",
-                    gambar: "https://via.placeholder.com/300x200.png?text=Kunyit", // Ganti dengan URL gambar asli
+                    gambar: "web/images/kunyit.jpg", // Ganti dengan URL gambar asli
                     deskripsiSingkat: "Rimpang berwarna kuning pekat yang kaya akan kurkumin.",
                     manfaat: "Anti-inflamasi, antioksidan, baik untuk kesehatan lambung, dan dapat meningkatkan daya tahan tubuh.",
                     caraPengolahan: "Diparut dan diperas untuk membuat jamu kunyit asam, atau dijadikan bumbu masakan."
@@ -238,7 +238,7 @@
                     id: 3,
                     nama: "Lidah Buaya",
                     namaLatin: "Aloe vera",
-                    gambar: "https://via.placeholder.com/300x200.png?text=Lidah+Buaya", // Ganti dengan URL gambar asli
+                    gambar: "web/images/lidahbuaya.jpg", // Ganti dengan URL gambar asli
                     deskripsiSingkat: "Tanaman sukulen dengan daun tebal berisi gel bening.",
                     manfaat: "Menyembuhkan luka bakar ringan, melembapkan kulit, baik untuk kesehatan rambut, dan dapat dibuat minuman.",
                     caraPengolahan: "Ambil gel di dalam daun. Bisa langsung dioleskan ke kulit atau diolah menjadi jus."
@@ -247,7 +247,7 @@
                     id: 4,
                     nama: "Kencur",
                     namaLatin: "Kaempferia galanga",
-                    gambar: "https://via.placeholder.com/300x200.png?text=Kencur", // Ganti dengan URL gambar asli
+                    gambar: "web/images/kencur.jpg", // Ganti dengan URL gambar asli
                     deskripsiSingkat: "Rimpang dengan aroma khas yang sering digunakan untuk jamu.",
                     manfaat: "Meredakan batuk, menambah nafsu makan, dan mengatasi pegal linu.",
                     caraPengolahan: "Dihaluskan bersama beras untuk jamu beras kencur atau sebagai bumbu pecel."
@@ -282,7 +282,8 @@
 
             // --- FUNGSI UNTUK MEMBUKA MODAL ---
             function openModal(id) {
-                const tanaman = togaData.find(t => t.id == id);
+                // Using parseInt to ensure a strict comparison (===) between number and string
+                const tanaman = togaData.find(t => t.id === parseInt(id, 10));
                 if (!tanaman) return;
 
                 modalBody.innerHTML = `
