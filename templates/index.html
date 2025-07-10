@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database TOGA Kelurahan Sambiroto</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header>
+        <h1>Database TOGA Sambiroto</h1>
+        <a href="{{ url_for('login') }}" class="admin-login-btn">Login Admin</a>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Ensiklopedia Tanaman Obat Keluarga</h2>
+            <p>Temukan manfaat dan cara pengolahan TOGA di sekitar Anda.</p>
+        </section>
+
+        <section class="search-container">
+            <input type="text" id="search-input" placeholder="Cari nama tanaman, contoh: Jahe...">
+        </section>
+
+        <section class="controls-container">
+            <div class="sort-container">
+                <label>Urutkan:</label>
+                <button id="sort-asc" class="sort-btn active">A-Z</button>
+                <button id="sort-desc" class="sort-btn">Z-A</button>
+            </div>
+            <div class="per-page-container">
+                <label for="items-per-page">Item per halaman:</label>
+                <select id="items-per-page">
+                    <option value="5" selected>5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                </select>
+            </div>
+        </section>
+
+        <section id="toga-grid" class="toga-grid">
+        </section>
+
+        <nav id="pagination-container" class="pagination-container"></nav>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 KKN-T 118 UNDIP & Kelurahan Sambiroto</p>
+    </footer>
+
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="modal-body" class="modal-body">
+                </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

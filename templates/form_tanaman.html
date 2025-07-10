@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Database TOGA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>{{ title }}</h1>
+    </header>
+
+    <main class="admin-form-page">
+        <form method="POST" enctype="multipart/form-data" class="crud-form">
+            <div class="form-group">
+                <label for="nama">Nama Tanaman</label>
+                <input type="text" id="nama" name="nama" value="{{ tanaman.nama or '' }}" required>
+            </div>
+            <div class="form-group">
+                <label for="namaLatin">Nama Latin</label>
+                <input type="text" id="namaLatin" name="namaLatin" value="{{ tanaman.namaLatin or '' }}">
+            </div>
+            <div class="form-group">
+                <label for="deskripsiSingkat">Deskripsi Singkat</label>
+                <textarea id="deskripsiSingkat" name="deskripsiSingkat" rows="3" required>{{ tanaman.deskripsiSingkat or '' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="manfaat">Manfaat & Khasiat</label>
+                <textarea id="manfaat" name="manfaat" rows="5" required>{{ tanaman.manfaat or '' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="caraPengolahan">Cara Pengolahan</label>
+                <textarea id="caraPengolahan" name="caraPengolahan" rows="5" required>{{ tanaman.caraPengolahan or '' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="gambar">Gambar</label>
+                {% if tanaman.gambar %}
+                    <p>Gambar saat ini: <img src="{{ url_for('static', filename=tanaman.gambar) }}" alt="Gambar saat ini" class="form-current-img"></p>
+                {% endif %}
+                <input type="file" id="gambar-input" name="gambar" accept="image/*">
+                <p id="file-size-error" style="color: #e76f51; font-size: 0.9em; margin-top: 5px;"></p>
+            </div>
+            <div class="form-actions">
+                <a href="{{ url_for('admin_dashboard') }}" class="btn-cancel">Batal</a>
+                <button type="submit" id="submit-btn" class="btn-submit">Simpan</button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Tambahkan script validasi khusus untuk form ini -->
+    <script src="{{ url_for('static', filename='form_validation.js') }}"></script>
+</body>
+</html>

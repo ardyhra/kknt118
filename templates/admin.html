@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Database TOGA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard</h1>
+        <nav>
+            <a href="{{ url_for('logout') }}" class="admin-login-btn">Logout</a>
+        </nav>
+    </header>
+
+    <main class="admin-dashboard">
+        <div class="admin-actions">
+            <h2>Manajemen Tanaman Obat</h2>
+            <a href="{{ url_for('add_tanaman') }}" class="btn-add">Tambah Tanaman Baru</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Kotak Pencarian Admin -->
+        <div class="admin-search-container">
+            <input type="text" id="admin-search-input" placeholder="Cari berdasarkan nama atau nama latin...">
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <!-- Header sekarang menggunakan data-sort untuk JavaScript -->
+                        <th class="sortable" data-sort="id">ID<span class="sort-indicator"></span></th>
+                        <th>Gambar</th>
+                        <th class="sortable" data-sort="nama">Nama<span class="sort-indicator"></span></th>
+                        <th class="sortable" data-sort="namaLatin">Nama Latin<span class="sort-indicator"></span></th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="toga-table-body">
+                    <!-- Baris tabel akan diisi secara dinamis oleh JavaScript -->
+                    <tr>
+                        <td colspan="5" style="text-align: center;">Memuat data...</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Pagination container for the admin table -->
+            <nav id="admin-pagination-container" class="pagination-container"></nav>
+        </div>
+    </main>
+
+    <!-- Tambahkan file JavaScript baru untuk halaman admin -->
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>
