@@ -16,7 +16,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const sortDescBtn = document.getElementById('sort-desc');
     const itemsPerPageSelect = document.getElementById('items-per-page');
     const paginationContainer = document.getElementById('pagination-container');
+    const scanBtn = document.getElementById('scan-qr-btn');
+    const qrReaderElement = document.getElementById('qr-reader');
+    // Inisialisasi scanner
+    const html5QrCode = new Html5Qrcode("qr-reader");
 
+    // Fungsi yang akan dijalankan jika scan berhasil
+    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+        console.log(`Scan berhasil: ${decodedText}`);
+        
+        // Hentikan scanner setelah berhasil
+        html5QrCode.stop().then((ignore) => {
+          qrReaderElement.style.display = "none";
+          console.log("QR Code scanning is stopped.");
+        }).catch((err) => {
+          console.log("Gagal menghentikan scanner.", err);
+        });
+
+        // Ekstrak ID dari URL yang di-scan
+        // Contoh URL: http://127.0.0.1:5000/tanaman/5
+        try {
+            const url = new URL(decodedText);
+            const pathParts = url.pathname.split('/');
+            const plantId = pathParts[pathParts.length - 1]; // Ambil bagian terakhir dari path
+
+            if (plantId && !isNaN(plantId)) {
+                // Panggil fungsi modal yang sudah ada!
+                openModal(plantId); 
+            } else {
+                alert("QR Code tidak valid.");
+            }
+        } catch(e) {
+            console.error("Format URL dari QR code tidak valid.", e);
+            alert("QR Code tidak valid.");
+        }
+    };
+
+    // Konfigurasi scanner
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+    // Event listener untuk tombol Scan
+    scanBtn.addEventListener('click', () => {
+        qrReaderElement.style.display = "block";
+        // Mulai scanner
+        html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+    });
+    
     // --- FUNGSI UTAMA UNTUK MEMPROSES DAN MENAMPILKAN DATA ---
     function updateDisplay() {
         // 1. Filter data berdasarkan pencarian

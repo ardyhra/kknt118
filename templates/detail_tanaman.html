@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ tanaman.nama }} - Database TOGA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <style>
+        /* Style sederhana khusus untuk halaman detail */
+        .detail-container {
+            max-width: 800px;
+            margin: 1rem auto;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .detail-img {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .detail-container h2 {
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+        .detail-container h4 {
+            margin-top: 1.5rem;
+            border-bottom: 2px solid var(--primary-green);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Detail Tanaman</h1>
+    </header>
+    <main>
+        <div class="detail-container">
+            <img src="{{ url_for('static', filename=tanaman.gambar) }}" alt="{{ tanaman.nama }}" class="detail-img">
+            <h2>{{ tanaman.nama }}</h2>
+            <p><i>{{ tanaman.namaLatin }}</i></p>
+
+            <h4>Deskripsi</h4>
+            <p>{{ tanaman.deskripsiSingkat }}</p>
+
+            <h4>Manfaat & Khasiat</h4>
+            <p>{{ tanaman.manfaat }}</p>
+
+            <h4>Cara Pengolahan</h4>
+            <p>{{ tanaman.caraPengolahan }}</p>
+        </div>
+    </main>
+</body>
+</html>

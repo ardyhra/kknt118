@@ -56,6 +56,17 @@ def index():
     # Perintah ini akan mencari 'index.html' di dalam folder 'templates'
     return render_template('index.html')
 
+# Tambahkan di bagian ROUTE UNTUK HALAMAN UTAMA
+@app.route('/tanaman/<int:id>')
+def detail_tanaman(id):
+    conn = db_connection()
+    tanaman = conn.execute('SELECT * FROM tanaman WHERE id = ?', (id,)).fetchone()
+    conn.close()
+    if tanaman is None:
+        return "Tanaman tidak ditemukan", 404
+    # Kita akan membuat template detail_tanaman.html di langkah berikutnya
+    return render_template('detail_tanaman.html', tanaman=tanaman)
+
 # --- ROUTE UNTUK API ANDA ---
 @app.route('/api/tanaman', methods=['GET'])
 def get_tanaman():

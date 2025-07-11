@@ -11,6 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.getElementById('toga-table-body');
     const searchInput = document.getElementById('admin-search-input');
     const paginationContainer = document.getElementById('admin-pagination-container');
+    const adminModal = document.getElementById('admin-modal');
+    const modalImage = document.getElementById('modal-image');
+    const modalQRCodeContainer = document.getElementById('modal-qrcode');
+    const modalActions = document.getElementById('modal-actions');
+    const downloadQRBtn = document.getElementById('download-qr-btn');
+    const closeModalBtn = document.querySelector('.admin-modal-close');
 
     // --- FUNGSI UTAMA UNTUK MEMPROSES DAN MENAMPILKAN DATA ---
     // Fungsi ini TIDAK melakukan fetch, hanya memproses data yang sudah ada.
@@ -72,6 +78,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Fungsi baru untuk generate semua QR Code di tabel
+    function generateAllQRCodes() {
+        const containers = document.querySelectorAll('.qrcode-container');
+        containers.forEach(container => {
+            // Hapus QR code lama jika ada
+            container.innerHTML = ''; 
+            // Ambil URL dari atribut data
+            const url = container.dataset.url;
+            if (url) {
+                new QRCode(container, {
+                    text: url,
+                    width: 80,
+                    height: 80,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        });
+    }
+
     // Fungsi untuk membangun baris tabel dari data JSON
     function renderTable(data) {
         tableBody.innerHTML = ''; // Kosongkan isi tabel sebelumnya
@@ -84,11 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
         data.forEach(tanaman => {
             const row = document.createElement('tr');
             const imageUrl = tanaman.gambar ? `/static/${tanaman.gambar}` : '';
+            // Buat URL lengkap untuk QR Code
+            const detailUrl = `${window.location.origin}/tanaman/${tanaman.id}`;
 
             // Wrapper untuk tombol aksi agar konsisten
             row.innerHTML = ` 
                 <td>${tanaman.id}</td>
-                <td><img src="${imageUrl}" alt="${tanaman.nama}" class="table-img"></td>
+                <td><img src="${imageUrl}" alt="${tanaman.nama}" class="table-img table-img-clickable"></td>
                 <td>${tanaman.nama}</td>
                 <td>${tanaman.namaLatin || ''}</td>
                 <td>
@@ -99,11 +128,77 @@ document.addEventListener('DOMContentLoaded', () => {
                         </form>
                     </div>
                 </td>
+                <td>
+                    <div class="qrcode-container qrcode-clickable" data-url="${detailUrl}"></div>
+                </td>
             `;
             tableBody.appendChild(row);
         });
+
+        // Panggil fungsi untuk generate QR code setelah semua baris ditambahkan
+        generateAllQRCodes(); 
     }
 
+    // --- LOGIKA BARU UNTUK MODAL ---
+
+    // Fungsi untuk membuka modal
+    function openAdminModal() {
+        if (adminModal) adminModal.style.display = 'flex';
+    }
+
+    // Fungsi untuk menutup modal
+    function closeAdminModal() {
+        if (adminModal) adminModal.style.display = 'none';
+    }
+
+    // Event delegation untuk seluruh body tabel
+    tableBody.addEventListener('click', (e) => {
+        // Cek jika yang diklik adalah gambar
+        if (e.target.classList.contains('table-img-clickable')) {
+            modalImage.src = e.target.src;
+            modalImage.style.display = 'block';
+            modalQRCodeContainer.style.display = 'none';
+            modalActions.style.display = 'none';
+            openAdminModal();
+        }
+
+        // Cek jika yang diklik adalah container QR code (atau gambar di dalamnya)
+        const qrContainer = e.target.closest('.qrcode-clickable');
+        if (qrContainer) {
+            const url = qrContainer.dataset.url;
+            modalQRCodeContainer.innerHTML = ''; // Kosongkan dulu
+
+            // Buat QR Code yang lebih besar di dalam modal
+            new QRCode(modalQRCodeContainer, {
+                text: url, width: 256, height: 256,
+            });
+
+            modalImage.style.display = 'none';
+            modalQRCodeContainer.style.display = 'block';
+            modalActions.style.display = 'block';
+            openAdminModal();
+        }
+    });
+
+    // Event listener untuk tombol download
+    downloadQRBtn.addEventListener('click', () => {
+        // Cari elemen canvas yang dibuat oleh qrcode.js di dalam modal
+        const canvas = modalQRCodeContainer.querySelector('canvas');
+        if (canvas) {
+            // Ubah link download agar menggunakan data dari canvas
+            downloadQRBtn.href = canvas.toDataURL("image/png");
+        }
+    });
+
+    // Event listener untuk tombol close dan background modal
+    closeModalBtn.addEventListener('click', closeAdminModal);
+    adminModal.addEventListener('click', (e) => {
+        if (e.target === adminModal) {
+            closeAdminModal();
+        }
+    });
+
+    // --- LOGIKA SORTING DAN PAGINASI ---
     // Fungsi untuk memperbarui indikator panah (▲/▼) di header
     function updateSortIndicators(sortBy, order) {
         document.querySelectorAll('th.sortable .sort-indicator').forEach(span => span.textContent = '');
