@@ -181,13 +181,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Event listener untuk tombol download
-    downloadQRBtn.addEventListener('click', () => {
+    downloadQRBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // Mencegah aksi default dari link
+ 
         // Cari elemen canvas yang dibuat oleh qrcode.js di dalam modal
-        const canvas = modalQRCodeContainer.querySelector('canvas');
-        if (canvas) {
-            // Ubah link download agar menggunakan data dari canvas
-            downloadQRBtn.href = canvas.toDataURL("image/png");
-        }
+        const originalCanvas = modalQRCodeContainer.querySelector('canvas');
+        if (!originalCanvas) return;
+ 
+        const padding = 20; // Ukuran frame putih di sekeliling QR code
+        const newCanvas = document.createElement('canvas');
+        const ctx = newCanvas.getContext('2d');
+ 
+        // Atur ukuran canvas baru, lebih besar dari yang asli
+        newCanvas.width = originalCanvas.width + padding * 2;
+        newCanvas.height = originalCanvas.height + padding * 2;
+ 
+        // 1. Isi canvas baru dengan background putih
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+ 
+        // 2. Gambar QR code asli di tengah canvas baru
+        ctx.drawImage(originalCanvas, padding, padding);
+ 
+        // 3. Buat link sementara untuk memicu download secara andal
+        const tempLink = document.createElement('a');
+        tempLink.download = 'qrcode-toga.png'; // Beri nama file yang lebih deskriptif
+        tempLink.href = newCanvas.toDataURL('image/png');
+        document.body.appendChild(tempLink); // Link harus ada di DOM untuk diklik
+        tempLink.click();
+        document.body.removeChild(tempLink); // Hapus link setelah selesai
     });
 
     // Event listener untuk tombol close dan background modal
