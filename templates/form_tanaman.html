@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} - Database TOGA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
 </head>
 <body>
     <header>
@@ -38,13 +40,17 @@
                 {% if tanaman.gambar %}
                     <p>Gambar saat ini: <img src="{{ url_for('static', filename=tanaman.gambar) }}" alt="Gambar saat ini" class="form-current-img"></p>
                 {% endif %}
-                <input type="file" id="gambar" name="gambar" accept="image/*">
+                <input type="file" id="gambar-input" name="gambar" accept="image/*">
+                <p id="file-size-error" style="color: #e76f51; font-size: 0.9em; margin-top: 5px;"></p>
             </div>
             <div class="form-actions">
                 <a href="{{ url_for('admin_dashboard') }}" class="btn-cancel">Batal</a>
-                <button type="submit" class="btn-submit">Simpan</button>
+                <button type="submit" id="submit-btn" class="btn-submit">Simpan</button>
             </div>
         </form>
     </main>
+
+    <!-- Tambahkan script validasi khusus untuk form ini -->
+    <script src="{{ url_for('static', filename='form_validation.js') }}"></script>
 </body>
 </html>
