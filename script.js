@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let filteredAndSortedData = []; // Menyimpan data setelah difilter dan diurutkan
     let currentSortOrder = 'asc'; // Default sort order: 'asc' (A-Z) or 'desc' (Z-A)
     let currentPage = 1;
-    let itemsPerPage = 5; // Nilai default, akan diupdate dari dropdown
+    let itemsPerPage = 4; // Nilai default, akan diupdate dari dropdown
 
     // --- ELEMEN DOM ---
     const grid = document.getElementById('toga-grid');
@@ -16,65 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sortDescBtn = document.getElementById('sort-desc');
     const itemsPerPageSelect = document.getElementById('items-per-page');
     const paginationContainer = document.getElementById('pagination-container');
-    const scanBtn = document.getElementById('scan-qr-btn');
-    const qrReaderElement = document.getElementById('qr-reader');
-    // Inisialisasi scanner
-    const html5QrCode = new Html5Qrcode("qr-reader");
 
-    // Fungsi yang akan dijalankan jika scan berhasil
-    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-        console.log(`Scan berhasil: ${decodedText}`);
-        
-        // Hentikan scanner setelah berhasil
-        html5QrCode.stop().then((ignore) => {
-          qrReaderElement.style.display = "none";
-          scanBtn.textContent = "Scan QR Code Tanaman"; // Reset teks tombol setelah berhasil
-          console.log("QR Code scanning is stopped.");
-        }).catch((err) => {
-          console.log("Gagal menghentikan scanner.", err);
-        });
-
-        // Ekstrak ID dari URL yang di-scan
-        // Contoh URL: http://127.0.0.1:5000/tanaman/5
-        try {
-            const url = new URL(decodedText);
-            const pathParts = url.pathname.split('/');
-            const plantId = pathParts[pathParts.length - 1]; // Ambil bagian terakhir dari path
-
-            if (plantId && !isNaN(plantId)) {
-                // Panggil fungsi modal yang sudah ada!
-                openModal(plantId); 
-            } else {
-                alert("QR Code tidak valid.");
-            }
-        } catch(e) {
-            console.error("Format URL dari QR code tidak valid.", e);
-            alert("QR Code tidak valid.");
-        }
-    };
-
-    // Konfigurasi scanner
-    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
-    // Event listener untuk tombol Scan
-    scanBtn.addEventListener('click', () => {
-        if (scanBtn.textContent === "Scan QR Code Tanaman") {
-            qrReaderElement.style.display = "block";
-            scanBtn.textContent = "Tutup Scan QR";
-            // Mulai scanner
-            html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
-        } else {
-            html5QrCode.stop().then(() => {
-                qrReaderElement.style.display = "none";
-                scanBtn.textContent = "Scan QR Code Tanaman";
-                console.log("QR Code scanning is stopped.");
-            }).catch(err => {
-                console.error("Gagal menghentikan scanner.", err);
-                alert("Gagal menutup scanner.");
-            });
-        }
-    });    
-    
     // --- FUNGSI UTAMA UNTUK MEMPROSES DAN MENAMPILKAN DATA ---
     function updateDisplay() {
         // 1. Filter data berdasarkan pencarian
@@ -140,22 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (pageCount <= 1) return; // Tidak perlu tombol jika hanya 1 halaman
 
-        // --- Tombol "Previous" ---
-        const prevBtn = document.createElement('button');
-        prevBtn.className = 'page-btn';
-        prevBtn.innerHTML = '&laquo;'; // Karakter panah kiri
-        prevBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                updateDisplay();
-            }
-        });
-        if (currentPage === 1) {
-            prevBtn.disabled = true; // Nonaktifkan jika di halaman pertama
-        }
-        paginationContainer.appendChild(prevBtn);
-
-        // --- Tombol Angka Halaman ---
         for (let i = 1; i <= pageCount; i++) {
             const btn = document.createElement('button');
             btn.className = 'page-btn';
@@ -165,25 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             btn.addEventListener('click', () => {
                 currentPage = i;
+                // Cukup panggil updateDisplay, karena itu akan memanggil semuanya
                 updateDisplay();
             });
             paginationContainer.appendChild(btn);
         }
-
-        // --- Tombol "Next" ---
-        const nextBtn = document.createElement('button');
-        nextBtn.className = 'page-btn';
-        nextBtn.innerHTML = '&raquo;'; // Karakter panah kanan
-        nextBtn.addEventListener('click', () => {
-            if (currentPage < pageCount) {
-                currentPage++;
-                updateDisplay();
-            }
-        });
-        if (currentPage === pageCount) {
-            nextBtn.disabled = true; // Nonaktifkan jika di halaman terakhir
-        }
-        paginationContainer.appendChild(nextBtn);
     }
 
     // --- FUNGSI UNTUK MENGAMBIL DATA DARI API ---
@@ -218,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <h2>${tanaman.nama}</h2>
             <p><i>${tanaman.namaLatin}</i></p>
             <br>
-            <img src="${imagePath}" alt="${tanaman.nama}" class="modal-img">
+            <img src="${imagePath}" alt="${tanaman.nama}" style="width:100%; max-height: 250px; object-fit: cover; border-radius: 5px;">
             <h4>Manfaat & Khasiat</h4>
             <p>${tanaman.manfaat}</p>
             <h4>Cara Pengolahan</h4>

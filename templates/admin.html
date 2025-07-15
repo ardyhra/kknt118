@@ -4,15 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Database TOGA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header>
         <h1>Admin Dashboard</h1>
         <nav>
-            <a href="{{ url_for('logout') }}" class="admin-login-btn">Logout</a>
+            <a href="{{ url_for('logout') }}" class="admin-nav-link">Logout</a>
         </nav>
     </header>
 
@@ -30,57 +28,39 @@
             {% endif %}
         {% endwith %}
 
-        <!-- Kotak Pencarian Admin -->
-        <div class="admin-search-container">
-            <input type="text" id="admin-search-input" placeholder="Cari berdasarkan nama atau nama latin...">
-        </div>
-
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <!-- Header sekarang menggunakan data-sort untuk JavaScript -->
-                        <th class="sortable" data-sort="id">ID<span class="sort-indicator"></span></th>
+                        <th>ID</th>
                         <th>Gambar</th>
-                        <th class="sortable" data-sort="nama">Nama<span class="sort-indicator"></span></th>
-                        <th class="sortable" data-sort="namaLatin">Nama Latin<span class="sort-indicator"></span></th>
+                        <th>Nama</th>
+                        <th>Nama Latin</th>
                         <th>Aksi</th>
-                        <th>QR Code</th>
                     </tr>
                 </thead>
-                <tbody id="toga-table-body">
-                    <!-- Baris tabel akan diisi secara dinamis oleh JavaScript -->
+                <tbody>
+                    {% for tanaman in all_tanaman %}
                     <tr>
-                        <td colspan="5" style="text-align: center;">Memuat data...</td>
+                        <td>{{ tanaman.id }}</td>
+                        <td><img src="{{ url_for('static', filename=tanaman.gambar) if tanaman.gambar else '' }}" alt="{{ tanaman.nama }}" class="table-img"></td>
+                        <td>{{ tanaman.nama }}</td>
+                        <td>{{ tanaman.namaLatin }}</td>
+                        <td class="action-buttons">
+                            <a href="{{ url_for('edit_tanaman', id=tanaman.id) }}" class="btn-edit">Edit</a>
+                            <form action="{{ url_for('delete_tanaman', id=tanaman.id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus tanaman ini?');">
+                                <button type="submit" class="btn-delete">Hapus</button>
+                            </form>
+                        </td>
                     </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5">Belum ada data tanaman.</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
-
-            <!-- Pagination container for the admin table -->
-            <nav id="admin-pagination-container" class="pagination-container"></nav>
         </div>
     </main>
-    <footer>
-        <p>&copy; 2025 KKN-T 118 UNDIP & Kelurahan Sambiroto</p>
-    </footer>
-
-
-    <div id="admin-modal" class="admin-modal">
-        <div class="admin-modal-content">
-            <span class="admin-modal-close">&times;</span>
-            <div id="admin-modal-body">
-                <img id="modal-image" src="" alt="Gambar Diperbesar">
-                <div id="modal-qrcode"></div>
-            </div>
-            <div id="modal-actions" class="modal-actions">
-                <a id="download-qr-btn" class="btn-add" download="qrcode.png">Unduh QR Code</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tambahkan file JavaScript baru untuk halaman admin -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    <script src="{{ url_for('static', filename='admin.js') }}"></script>
-    
 </body>
 </html>
