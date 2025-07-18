@@ -207,27 +207,95 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- FUNGSI UNTUK MEMBUKA MODAL ---
-    function openModal(id) {
+    async function openModal(id) {
         // Cari data dari `allTogaData` karena ID unik
         const tanaman = allTogaData.find(t => t.id === parseInt(id, 10));
         if (!tanaman) return;
 
         const imagePath = `/static/${tanaman.gambar}`;
 
+        // Tampilkan informasi dasar & placeholder untuk resep
         modalBody.innerHTML = `
             <h2>${tanaman.nama}</h2>
-            <p><i>${tanaman.namaLatin}</i></p>
-            <br>
+            <p><i>${tanaman.namaLatin || ''}</i></p>
             <img src="${imagePath}" alt="${tanaman.nama}" class="modal-img">
-            <h4>Manfaat & Khasiat</h4>
-            <p>${tanaman.manfaat}</p>
-            <h4>Cara Pengolahan</h4>
-            <p>${tanaman.caraPengolahan}</p>
+            ${tanaman.deskripsiSingkat ? `<h4>Deskripsi Singkat</h4><p>${tanaman.deskripsiSingkat}</p>` : ''}
+            ${tanaman.manfaat ? `<h4>Manfaat & Khasiat</h4><p style="white-space: pre-wrap;">${tanaman.manfaat}</p>` : ''}
+            ${tanaman.caraPengolahan ? `<h4>Cara Pengolahan</h4><p style="white-space: pre-wrap;">${tanaman.caraPengolahan}</p>` : ''}
+            ${allTogaData.length > 0 ? `
+                <h4>Resep & Olahan Terkait</h4>
+                <div id="resep-container"><p>Memuat resep...</p></div>
+            ` : ''}
         `;
         modal.classList.add('active');
-    }
+
+        // Ambil dan tampilkan resep
+        try {
+            // Perbaikan: Kita tidak lagi mengambil resep di sini
+            // Sekarang, kita arahkan ke halaman detail tanaman untuk melihat resep lengkap
+
+            // Cek apakah allTogaData sudah terisi (untuk mencegah error saat inisialisasi)
+            if (allTogaData.length === 0) {
+                return; // Skip pengambilan data jika belum siap
+            }
+
+            // Ambil resep dari allTogaData
+            const resep_list = allTogaData.find(t => t.id === parseInt(id)).resep;
+
+            // Jika tanaman tidak ditemukan atau allTogaData belum siap, keluar
+            if (!resep_list) {
+                return;
+            }
+            const resepContainer = document.getElementById('resep-container');
+
+            if (resep_list.length > 0) {
+                resepContainer.innerHTML = resep_list.map(resep => `
+                    <div class="resep-item" data-resep-id="${resep.id}">
+                        <button class="resep-btn">${resep.nama_resep}</button>
+                        <div class="resep-detail" style="display: none;">
+                            <strong>Bahan:</strong>
+                            <p style="white-space: pre-wrap;">${resep.bahan}</p>
+                            <strong>Langkah-langkah:</strong>
+                            <p style="white-space: pre-wrap;">${resep.langkah_pembuatan}</p>
+                        </div>
+                    </div>
+                `).join('');                
+            } else {
+                resepContainer.innerHTML = '<p>Belum ada resep untuk tanaman ini.</p>';
+            }
+            attachResepToggleListeners();
+        } catch (error) {
+            console.error("Error fetching recipes:", error);
+            document.getElementById('resep-container').innerHTML = '<p>Gagal memuat data resep.</p>';
+        }
+    } 
 
     // --- EVENT LISTENERS ---
+    
+    function attachResepToggleListeners() {
+        const resepItems = document.querySelectorAll('.resep-item');
+        resepItems.forEach(item => {
+            const button = item.querySelector('.resep-btn');
+            const detail = item.querySelector('.resep-detail');
+
+            button.addEventListener('click', () => {
+                // Cek apakah detail saat ini sedang akan dibuka
+                const isOpening = detail.style.display === 'none';
+
+                // Selalu sembunyikan semua detail dan nonaktifkan semua tombol terlebih dahulu
+                resepItems.forEach(otherItem => {
+                    otherItem.querySelector('.resep-detail').style.display = 'none';
+                    otherItem.querySelector('.resep-btn').classList.remove('active');
+                });
+
+                // Jika tujuannya adalah untuk membuka, maka tampilkan detail dan aktifkan tombolnya
+                if (isOpening) {
+                    detail.style.display = 'block';
+                    button.classList.add('active');
+                }
+            });
+        });
+    }
 
     searchInput.addEventListener('input', () => {
         currentPage = 1; // Kembali ke halaman pertama setiap kali mencari

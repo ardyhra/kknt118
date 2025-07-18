@@ -37,7 +37,10 @@
 </head>
 <body>
     <header>
-        <h1>Detail Tanaman</h1>
+        <h1>Database TOGA Sambiroto</h1>
+        <nav class="header-nav">
+            <a href="{{ url_for('index') }}" class="admin-login-btn">&larr; Kembali ke Beranda</a>
+        </nav>
     </header>
     <main>
         <div class="detail-container">
@@ -53,6 +56,21 @@
 
             <h4>Cara Pengolahan</h4>
             <p>{{ tanaman.caraPengolahan }}</p>
+
+            <h4>Resep & Olahan Terkait</h4>
+            {% if resep_list %}
+                {% for resep in resep_list %}
+                <div class="resep-item">
+                    <h5>{{ resep.nama_resep }}</h5>
+                    <strong>Bahan:</strong>
+                    <p>{{ resep.bahan | nl2br }}</p>
+                    <strong>Langkah-langkah:</strong>
+                    <p>{{ resep.langkah_pembuatan | nl2br }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Belum ada resep untuk tanaman ini.</p>
+            {% endif %}
         </div>
     </main>
 </body>

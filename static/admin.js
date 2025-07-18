@@ -62,14 +62,18 @@ document.addEventListener('DOMContentLoaded', () => {
         tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Memuat data...</td></tr>';
         try {
             const response = await fetch(`/admin`, {
-                headers: {
+                headers: {  
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-            allAdminData = await response.json(); // Simpan data ke variabel global
+            const data = await response.json();
+            allAdminData = data.map(tanaman => ({
+                ...tanaman,
+                resep: tanaman.resep || [] // Pastikan 'resep' selalu berupa array
+            }));
             // Panggil updateTableView untuk pertama kali
             updateTableView();
         } catch (error) {
@@ -129,10 +133,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </td>
                 <td>
+                    ${tanaman.resep && tanaman.resep.length > 0 ?
+                        tanaman.resep.map(r => `<p>${r.nama_resep}</p>`).join('') :
+                        ''
+                    }
+                    <div style="margin-top: 0.5rem">
+                        <a href="/admin/tanaman/${tanaman.id}/resep" class="btn-manage">Atur Resep</a>
+                    </div>
+                </td>
+                <td>
                     <div class="qrcode-container qrcode-clickable" data-url="${detailUrl}"></div>
                 </td>
             `;
-            tableBody.appendChild(row);
+            tableBody.appendChild(row); // Tambahkan baris ke tabel
         });
 
         // Panggil fungsi untuk generate QR code setelah semua baris ditambahkan

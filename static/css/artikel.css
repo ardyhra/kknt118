@@ -1,0 +1,38 @@
+/* static/css/artikel.css */
+.artikel-list-page, .artikel-detail-page { padding: 2rem 5%; }
+
+.artikel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.artikel-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    color: var(--text-color);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.artikel-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
+.artikel-card-img { width: 100%; height: 200px; object-fit: cover; }
+.artikel-card-content { padding: 1.5rem; }
+.artikel-card-content h3 { color: var(--primary-green); margin-bottom: 0.5rem; }
+.artikel-meta { font-size: 0.85em; color: #6c757d; margin-bottom: 1rem; }
+.artikel-excerpt { line-height: 1.6; }
+
+.artikel-content { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 10px; }
+.artikel-header-img { width: 100%; border-radius: 8px; margin: 1.5rem 0; }
+.isi-artikel { line-height: 1.7; margin-top: 1.5rem; }
+.isi-artikel p { margin-bottom: 1rem; }
+
+/* CSS untuk resep di halaman detail */
+.resep-item {
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+}
+.resep-item h5 { font-size: 1.2rem; color: #333; }
+.resep-item strong { display: block; margin-top: 1rem; }

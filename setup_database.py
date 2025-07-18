@@ -16,7 +16,8 @@ initial_toga_data = [
     (9, "Jeruk Purut", "Citrus hystrix", "web/images/jeruk_purut.webp", "Jeruk dengan kulit keriput dan aroma yang sangat kuat.", "Baik untuk kekebalan tubuh dan melancarkan pencernaan.", "Daun dan kulitnya digunakan sebagai penyedap masakan."),
     (10, "Bayam", "Amaranthus spp.", "web/images/bayam.webp", "Sayuran hijau yang kaya akan zat besi.", "Sumber vitamin K dan mengandung folat.", "Direbus sebentar untuk sayur bening atau ditumis."),
     (11, "Kangkung", "Ipomoea aquatica", "web/images/kangkung.webp", "Sayuran air yang populer untuk masakan tumis.", "Mencegah anemia dan melindungi kesehatan mata.", "Ditumis dengan bumbu bawang putih atau terasi."),
-    (12, "Jahe Merah", "Zingiber officinale var. rubrum", "web/images/jahe_merah.webp", "Varian jahe dengan rimpang kemerahan dan rasa lebih pedas.", "Baik untuk kekebalan tubuh.", "Direbus untuk dibuat minuman herbal (wedang).")
+    (12, "Jahe Merah", "Zingiber officinale var. rubrum", "web/images/jahe_merah.webp", "Varian jahe dengan rimpang kemerahan dan rasa lebih pedas.", "Baik untuk kekebalan tubuh.", "Direbus untuk dibuat minuman herbal (wedang)."),
+    (13, "Daun Jeruk", "Citrus hystrix", "web/images/Daun_Jeruk.webp", "Daun dengan aroma segar yang khas, sering digunakan pada masakan.", "Meningkatkan kesehatan mulut dan membantu membersihkan darah.", "Diremas dan dimasukkan ke dalam bumbu masakan atau diseduh sebagai teh herbal.")
 ]
 
 def setup_database():
@@ -48,6 +49,34 @@ def setup_database():
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """, initial_toga_data)
         print(f"{len(initial_toga_data)} data tanaman berhasil dimasukkan.")
+        
+        # --- MEMBUAT TABEL 'artikel' BARU ---
+        cursor.execute("DROP TABLE IF EXISTS artikel") # Hapus jika sudah ada untuk testing
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS artikel (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                judul TEXT NOT NULL,
+                isi TEXT NOT NULL,
+                gambar_header TEXT,
+                penulis TEXT DEFAULT 'Admin',
+                tanggal_publikasi TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        print("Tabel 'artikel' berhasil dibuat.")
+
+        # --- MEMBUAT TABEL 'resep' BARU ---
+        cursor.execute("DROP TABLE IF EXISTS resep") # Hapus jika sudah ada untuk testing
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS resep (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nama_resep TEXT NOT NULL,
+                bahan TEXT NOT NULL,
+                langkah_pembuatan TEXT NOT NULL,
+                tanaman_id INTEGER NOT NULL,
+                FOREIGN KEY (tanaman_id) REFERENCES tanaman (id) ON DELETE CASCADE
+            )
+        """)
+        print("Tabel 'resep' berhasil dibuat.")
 
         conn.commit()
         conn.close()

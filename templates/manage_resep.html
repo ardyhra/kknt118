@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Resep untuk {{ tanaman.nama }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Kelola Resep</h1>
+        <!--
+            <nav class="header-nav">
+                <a href="{{ url_for('admin_dashboard') }}" class="admin-login-btn">Kembali ke Dashboard</a>
+            </nav>
+        -->
+    </header>
+
+    <main class="admin-dashboard">
+        <div class="admin-actions">
+            <h2>Resep untuk: <strong>{{ tanaman.nama }}</strong></h2>
+            <a href="{{ url_for('add_resep', tanaman_id=tanaman.id) }}" class="btn-add">Tambah Resep Baru</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama Resep</th>
+                        <th>Bahan</th>
+                        <th>Langkah Pembuatan</th>
+                        <th style="width: 10%;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for resep in resep_list %}
+                    <tr>
+                        <td>{{ resep.nama_resep }}</td>
+                        <td style="white-space: pre-wrap;">{{ resep.bahan }}</td>
+                        <td style="white-space: pre-wrap;">{{ resep.langkah_pembuatan }}</td>
+                        <td class="action-buttons-resep">
+                            <a href="{{ url_for('edit_resep', id=resep.id) }}" class="btn-edit">Edit</a>
+                            <form action="{{ url_for('delete_resep', id=resep.id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus resep ini?');">
+                                <button type="submit" class="btn-delete">Hapus</button>
+                            </form>
+                        </td>                        
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center;">Belum ada resep untuk tanaman ini.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn-cancel">&larr; Kembali ke Dashboard</a>
+        </div>
+    </main>
+</body>
+</html>

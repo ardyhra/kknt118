@@ -57,7 +57,25 @@ th.sortable:hover {
     align-items: center;
     gap: 0.5rem;
 }
+.action-buttons-resep {
+    display: table-cell;
+    text-align: center; /* Horizontally centers inline content (like buttons) */
+    vertical-align: middle;
+}
+.action-buttons-resep button { /* Assuming your buttons are <button> elements */
+    margin: 0 0.25rem; /* Adds a horizontal margin (0.25rem on left and right) */
+    display: inline-block; /* Ensures margin works correctly for inline elements */
+}
 .action-buttons form { margin: 0; }
+.btn-manage {
+    display: inline-block;
+    background-color: #28a745; /* Hijau */
+    color: white;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-radius: 5px;
+}
 
 /* --- Halaman Form CRUD --- */
 .admin-form-page { padding: 2rem 5%; }

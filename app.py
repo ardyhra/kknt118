@@ -61,6 +61,7 @@ def index():
 def detail_tanaman(id):
     conn = db_connection()
     tanaman = conn.execute('SELECT * FROM tanaman WHERE id = ?', (id,)).fetchone()
+    resep_list = conn.execute('SELECT * FROM resep WHERE tanaman_id = ? ORDER BY nama_resep', (id,)).fetchall()
     conn.close()
     if tanaman is None:
         return "Tanaman tidak ditemukan", 404
@@ -72,12 +73,156 @@ def detail_tanaman(id):
 def get_tanaman():
     conn = db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM tanaman")
-    # fetchall() sekarang akan mengembalikan list of Row objects
-    rows = cursor.fetchall()
+    cursor.execute("SELECT * FROM tanaman ORDER BY nama")
+    tanaman_list = [dict(row) for row in cursor.fetchall()]
+
+    # Ambil resep untuk setiap tanaman
+    for tanaman in tanaman_list:
+        cursor.execute("SELECT * FROM resep WHERE tanaman_id = ? ORDER BY nama_resep", (tanaman['id'],))
+        tanaman['resep'] = [dict(row) for row in cursor.fetchall()]
+
     conn.close()
-    # Ubah list of Row objects menjadi list of dictionaries agar menjadi JSON yang valid
-    return jsonify([dict(row) for row in rows])
+    return jsonify(tanaman_list)
+
+
+# --- ROUTE UNTUK FITUR BLOG/ARTIKEL ---
+
+@app.route('/artikel')
+def artikel_list():
+    conn = db_connection()
+    all_artikel = conn.execute('SELECT * FROM artikel ORDER BY tanggal_publikasi DESC').fetchall()
+    conn.close()
+    return render_template('artikel_list.html', all_artikel=all_artikel)
+
+@app.route('/artikel/<int:id>')
+def artikel_detail(id):
+    conn = db_connection()
+    artikel = conn.execute('SELECT * FROM artikel WHERE id = ?', (id,)).fetchone()
+    conn.close()
+    if artikel is None:
+        return "Artikel tidak ditemukan", 404
+    return render_template('artikel_detail.html', artikel=artikel)
+
+@app.route('/admin/artikel/add', methods=['GET', 'POST'])
+@login_required
+def add_artikel():
+    if request.method == 'POST':
+        judul = request.form['judul']
+        isi = request.form['isi']
+        gambar = request.files['gambar']
+        gambar_path = None
+        if gambar and allowed_file(gambar.filename):
+            filename = secure_filename(gambar.filename)
+            gambar.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # Simpan path relatif terhadap 'static'
+            gambar_path = f"web/images/{filename}"
+        
+        conn = db_connection()
+        conn.execute('INSERT INTO artikel (judul, isi, gambar_header) VALUES (?, ?, ?)',
+                     (judul, isi, gambar_path))
+        conn.commit()
+        conn.close()
+        flash(f"Artikel '{judul}' berhasil ditambahkan.", 'success')
+        return redirect(url_for('admin_dashboard')) # Arahkan ke dashboard utama setelah sukses
+
+    return render_template('form_artikel.html', title="Tambah Artikel Baru", artikel={})
+
+@app.route('/admin/artikel/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_artikel(id):
+    conn = db_connection()
+    artikel = conn.execute('SELECT * FROM artikel WHERE id = ?', (id,)).fetchone()
+
+    if request.method == 'POST':
+        judul = request.form['judul']
+        isi = request.form['isi']
+        gambar = request.files['gambar']
+
+        gambar_path = artikel['gambar_header'] # Gunakan gambar lama sebagai default
+        if gambar and allowed_file(gambar.filename):
+            filename = secure_filename(gambar.filename)
+            gambar.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            gambar_path = f"web/images/{filename}"
+
+        conn.execute('UPDATE artikel SET judul = ?, isi = ?, gambar_header = ? WHERE id = ?',
+                     (judul, isi, gambar_path, id))
+        conn.commit()
+        flash(f"Artikel '{judul}' berhasil diperbarui.", 'success')
+        return redirect(url_for('admin_dashboard'))
+
+    conn.close()
+    return render_template('form_artikel.html', title="Edit Artikel", artikel=artikel)
+
+# --- ROUTE UNTUK CRUD RESEP ---
+
+@app.route('/admin/tanaman/<int:tanaman_id>/resep')
+@login_required
+def manage_resep(tanaman_id):
+    conn = db_connection()
+    tanaman = conn.execute('SELECT * FROM tanaman WHERE id = ?', (tanaman_id,)).fetchone()
+    if not tanaman:
+        conn.close()
+        return "Tanaman tidak ditemukan.", 404
+    
+    resep_list = conn.execute('SELECT * FROM resep WHERE tanaman_id = ? ORDER BY nama_resep', (tanaman_id,)).fetchall()
+    conn.close()
+    return render_template('manage_resep.html', tanaman=tanaman, resep_list=resep_list)
+
+
+@app.route('/admin/resep/add/<int:tanaman_id>', methods=['GET', 'POST'])
+@login_required
+def add_resep(tanaman_id):
+    conn = db_connection()
+    tanaman = conn.execute('SELECT * FROM tanaman WHERE id = ?', (tanaman_id,)).fetchone()
+
+    if request.method == 'POST':
+        nama_resep = request.form['nama_resep']
+        bahan = request.form['bahan']
+        langkah_pembuatan = request.form['langkah_pembuatan']
+
+        conn.execute('INSERT INTO resep (nama_resep, bahan, langkah_pembuatan, tanaman_id) VALUES (?, ?, ?, ?)',
+                     (nama_resep, bahan, langkah_pembuatan, tanaman_id))
+        conn.commit()
+        conn.close()
+        flash(f"Resep '{nama_resep}' berhasil ditambahkan untuk {tanaman['nama']}.", 'success')
+        return redirect(url_for('admin_dashboard'))
+
+    conn.close()
+    return render_template('form_resep.html', title="Tambah Resep Baru", tanaman=tanaman, resep={})
+
+@app.route('/admin/resep/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_resep(id):
+    conn = db_connection()
+    resep = conn.execute('SELECT * FROM resep WHERE id = ?', (id,)).fetchone()
+    tanaman = conn.execute('SELECT * FROM tanaman WHERE id = ?', (resep['tanaman_id'],)).fetchone()
+
+    if request.method == 'POST':
+        nama_resep = request.form['nama_resep']
+        bahan = request.form['bahan']
+        langkah_pembuatan = request.form['langkah_pembuatan']
+
+        conn.execute('UPDATE resep SET nama_resep = ?, bahan = ?, langkah_pembuatan = ? WHERE id = ?',
+                     (nama_resep, bahan, langkah_pembuatan, id))
+        conn.commit()
+        conn.close()
+        flash(f"Resep '{nama_resep}' berhasil diperbarui.", 'success')
+        return redirect(url_for('admin_dashboard'))
+
+    conn.close()
+    return render_template('form_resep.html', title="Edit Resep", tanaman=tanaman, resep=resep)
+
+@app.route('/admin/resep/delete/<int:id>', methods=['POST']) # Perbaiki parameter jadi <int:id>
+@login_required
+def delete_resep(id):
+    conn = db_connection()
+    resep = conn.execute('SELECT * FROM resep WHERE id = ?', (id,)).fetchone()
+    if resep:
+        conn.execute('DELETE FROM resep WHERE id = ?', (id,))
+        conn.commit()
+        flash(f"Resep '{resep['nama_resep']}' telah dihapus.", 'success')
+    conn.close()
+    return redirect(url_for('admin_dashboard'))
 
 # --- ROUTE UNTUK OTENTIKASI ADMIN ---
 

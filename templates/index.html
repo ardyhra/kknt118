@@ -12,7 +12,10 @@
 
     <header>
         <h1>Database TOGA Sambiroto</h1>
-        <a href="{{ url_for('login') }}" class="admin-login-btn">Login Admin</a>
+        <nav class="header-nav">
+            <a href="{{ url_for('artikel_list') }}" class="admin-login-btn">Lihat Artikel</a>
+            <a href="{{ url_for('login') }}" class="admin-login-btn">Login Admin</a>
+        </nav>
     </header>
 
     <main>

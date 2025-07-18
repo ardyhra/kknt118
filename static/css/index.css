@@ -118,6 +118,40 @@
     margin-bottom: 1rem;
     background-color: #f4f4f4; 
 }
+/* Resep di dalam Modal */
+.resep-item {
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+.resep-btn {
+    background-color: var(--secondary-green);
+    color: #333;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: none; /* Hapus border default tombol */
+}
+.resep-btn:hover {
+    background-color: #f0d48a;
+}
+.resep-btn.active {
+    background-color: var(--primary-green);
+    color: white;
+}
+.resep-item p {
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
+.resep-item h5 { 
+    font-size: 1.2rem;
+    color: var(--primary-green);
+    margin-bottom: 0.5rem;
+}
+.resep-item strong { display: block; margin-top: 0.75rem; font-weight: 600; }
 
 .controls-container {
     display: flex;

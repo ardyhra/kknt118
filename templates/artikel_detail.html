@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ artikel.judul }} - Database TOGA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/artikel.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Artikel Edukasi</h1>
+        <nav class="header-nav">
+            <a href="{{ url_for('artikel_list') }}" class="admin-login-btn">Kembali ke Daftar Artikel</a>
+        </nav>
+    </header>
+    <main class="artikel-detail-page">
+        <article class="artikel-content">
+            <h1>{{ artikel.judul }}</h1>
+            <p class="artikel-meta">Oleh {{ artikel.penulis }} - {{ artikel.tanggal_publikasi.strftime('%d %B %Y') }}</p>
+            {% if artikel.gambar_header %}
+                <img src="{{ url_for('static', filename=artikel.gambar_header) }}" alt="{{ artikel.judul }}" class="artikel-header-img">
+            {% endif %}
+            <div class="isi-artikel">
+                {{ artikel.isi | safe }}
+            </div>
+        </article>
+    </main>
+</body>
+</html>

@@ -11,7 +11,7 @@
 <body>
     <header>
         <h1>Admin Dashboard</h1>
-        <nav>
+        <nav class="header-nav">
             <a href="{{ url_for('logout') }}" class="admin-login-btn">Logout</a>
         </nav>
     </header>
@@ -45,13 +45,14 @@
                         <th class="sortable" data-sort="nama">Nama<span class="sort-indicator"></span></th>
                         <th class="sortable" data-sort="namaLatin">Nama Latin<span class="sort-indicator"></span></th>
                         <th>Aksi</th>
+                        <th>Resep</th>
                         <th>QR Code</th>
                     </tr>
                 </thead>
                 <tbody id="toga-table-body">
                     <!-- Baris tabel akan diisi secara dinamis oleh JavaScript -->
                     <tr>
-                        <td colspan="5" style="text-align: center;">Memuat data...</td>
+                        <td colspan="7" style="text-align: center;">Memuat data...</td>
                     </tr>
                 </tbody>
             </table>

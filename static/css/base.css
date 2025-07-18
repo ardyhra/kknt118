@@ -25,13 +25,19 @@ header {
     color: white;
     padding: 1rem 5%;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 header h1 {
     font-size: 1.5rem;
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Menambahkan jarak antar tombol di header */
+    margin-left: auto; /* Mendorong grup tombol ke kanan */
 }
 
 main {
