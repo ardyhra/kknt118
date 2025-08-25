@@ -22,6 +22,11 @@
             <a href="{{ url_for('add_tanaman') }}" class="btn-add">Tambah Tanaman Baru</a>
         </div>
 
+        <div class="admin-actions">
+            <h2>Manajemen Artikel</h2>
+            <a href="{{ url_for('manage_artikel') }}" class="btn-add">Kelola Artikel</a>
+        </div>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}

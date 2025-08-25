@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Artikel - Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard</h1>
+        <nav class="header-nav">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn-add">Kembali ke Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="admin-login-btn">Logout</a>
+        </nav>
+    </header>
+
+    <main class="admin-dashboard">
+        <div class="admin-actions">
+            <h2>Manajemen Artikel</h2>
+            <a href="{{ url_for('add_artikel') }}" class="btn-add">Tambah Artikel Baru</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Judul</th>
+                        <th>Tanggal Publikasi</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for artikel in all_artikel %}
+                    <tr>
+                        <td>{{ artikel.id }}</td>
+                        <td>{{ artikel.judul }}</td>
+                        <td>{{ artikel.tanggal_publikasi }}</td>
+                        <td class="action-buttons">
+                            <a href="{{ url_for('edit_artikel', id=artikel.id) }}" class="btn-edit">Edit</a>
+                            <form action="{{ url_for('delete_artikel', id=artikel.id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus artikel ini?');">
+                                <button type="submit" class="btn-delete">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center;">Belum ada artikel.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 KKN-T 118 UNDIP & Kelurahan Sambiroto</p>
+    </footer>
+</body>
+</html>

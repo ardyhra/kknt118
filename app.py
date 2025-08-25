@@ -16,8 +16,8 @@ app.secret_key = 'kunci_rahasia_yang_sangat_aman_dan_sulit_ditebak'
 # Folder untuk menyimpan gambar yang di-upload
 app.config['UPLOAD_FOLDER'] = 'static/web/images'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-# Batasi ukuran upload file menjadi 1 MB
-app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024 # 1 MB
+# Batasi ukuran upload file menjadi 2 MB
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 # 2 MB
 
 def db_connection():
     conn = None
@@ -36,7 +36,7 @@ def allowed_file(filename):
 @app.errorhandler(413)
 @app.errorhandler(RequestEntityTooLarge)
 def request_entity_too_large(error):
-    flash('Ukuran file terlalu besar. Maksimal 1 MB.', 'danger')
+    flash('Ukuran file terlalu besar. Maksimal 2 MB.', 'danger')
     # Redirect kembali ke URL form yang sama tempat upload gagal.
     # Ini lebih andal daripada request.referrer.
     return redirect(request.url)
@@ -123,7 +123,7 @@ def add_artikel():
         conn.commit()
         conn.close()
         flash(f"Artikel '{judul}' berhasil ditambahkan.", 'success')
-        return redirect(url_for('admin_dashboard')) # Arahkan ke dashboard utama setelah sukses
+        return redirect(url_for('manage_artikel')) # Arahkan ke dashboard artikel setelah sukses
 
     return render_template('form_artikel.html', title="Tambah Artikel Baru", artikel={})
 
@@ -144,14 +144,50 @@ def edit_artikel(id):
             gambar.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             gambar_path = f"web/images/{filename}"
 
-        conn.execute('UPDATE artikel SET judul = ?, isi = ?, gambar_header = ? WHERE id = ?',
+        conn.execute('UPDATE artikel SET judul = ?, isi = ?, gambar_header = ? WHERE id = ?',\
                      (judul, isi, gambar_path, id))
         conn.commit()
         flash(f"Artikel '{judul}' berhasil diperbarui.", 'success')
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('manage_artikel'))
 
     conn.close()
     return render_template('form_artikel.html', title="Edit Artikel", artikel=artikel)
+
+@app.route('/admin/artikel')
+@login_required
+def manage_artikel():
+    conn = db_connection()
+    all_artikel = conn.execute('SELECT * FROM artikel ORDER BY tanggal_publikasi DESC').fetchall()
+    conn.close()
+    return render_template('manage_artikel.html', all_artikel=all_artikel)
+
+@app.route('/admin/artikel/delete/<int:id>', methods=['POST'])
+@login_required
+def delete_artikel(id):
+    conn = db_connection()
+    artikel = conn.execute('SELECT * FROM artikel WHERE id = ?', (id,)).fetchone()
+
+    if artikel:
+        # Hapus file gambar dari server jika ada
+        if artikel['gambar_header']:
+            try:
+                # Buat path file yang lengkap dari root folder 'static'
+                file_path = os.path.join('static', artikel['gambar_header'])
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            except Exception as e:
+                # Jika gagal menghapus file, catat error tapi jangan hentikan proses
+                print(f"Error saat menghapus file {artikel['gambar_header']}: {e}")
+
+        # Hapus record dari database
+        conn.execute('DELETE FROM artikel WHERE id = ?', (id,))
+        conn.commit()
+        flash(f"Artikel '{artikel['judul']}' telah dihapus.", 'success')
+    else:
+        flash('Artikel tidak ditemukan.', 'danger')
+
+    conn.close()
+    return redirect(url_for('manage_artikel'))
 
 # --- ROUTE UNTUK CRUD RESEP ---
 

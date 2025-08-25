@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artikel Edukasi - Database TOGA</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/artikel.css') }}">
 </head>
 <body>
@@ -23,7 +24,7 @@
                 {% endif %}
                 <div class="artikel-card-content">
                     <h3>{{ artikel.judul }}</h3>
-                    <p class="artikel-meta">Oleh {{ artikel.penulis }} - {{ artikel.tanggal_publikasi.strftime('%d %B %Y') }}</p>
+                    <p class="artikel-meta">Oleh {{ artikel.penulis }} - {{ artikel.tanggal_publikasi }}</p>
                     <p class="artikel-excerpt">{{ artikel.isi | truncate(150) }}</p>
                 </div>
             </a>

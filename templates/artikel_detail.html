@@ -17,7 +17,7 @@
     <main class="artikel-detail-page">
         <article class="artikel-content">
             <h1>{{ artikel.judul }}</h1>
-            <p class="artikel-meta">Oleh {{ artikel.penulis }} - {{ artikel.tanggal_publikasi.strftime('%d %B %Y') }}</p>
+            <p class="artikel-meta">Oleh {{ artikel.penulis }} - {{ artikel.tanggal_publikasi }}</p>
             {% if artikel.gambar_header %}
                 <img src="{{ url_for('static', filename=artikel.gambar_header) }}" alt="{{ artikel.judul }}" class="artikel-header-img">
             {% endif %}
